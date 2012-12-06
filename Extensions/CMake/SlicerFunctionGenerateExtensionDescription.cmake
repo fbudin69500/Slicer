@@ -20,7 +20,7 @@
 
 function(slicerFunctionGenerateExtensionDescription)
   set(options)
-  set(oneValueArgs EXTENSION_NAME EXTENSION_CATEGORY EXTENSION_ICONURL EXTENSION_CONTRIBUTORS EXTENSION_STATUS EXTENSION_HOMEPAGE EXTENSION_DESCRIPTION EXTENSION_SCREENSHOTURLS EXTENSION_DEPENDS EXTENSION_BUILD_SUBDIRECTORY EXTENSION_ENABLED EXTENSION_WC_TYPE EXTENSION_WC_REVISION EXTENSION_WC_ROOT EXTENSION_WC_URL DESTINATION_DIR SLICER_WC_REVISION SLICER_WC_ROOT)
+  set(oneValueArgs EXTENSION_NAME EXTENSION_CATEGORY EXTENSION_ICONURL EXTENSION_CONTRIBUTORS EXTENSION_STATUS EXTENSION_HOMEPAGE EXTENSION_DESCRIPTION EXTENSION_SCREENSHOTURLS EXTENSION_DEPENDS EXTENSION_BUILD_SUBDIRECTORY EXTENSION_ENABLED EXTENSION_WC_TYPE EXTENSION_WC_REVISION EXTENSION_WC_ROOT EXTENSION_WC_URL EXTENSION_SVNUSERNAME EXTENSION_SVNPASSWORD DESTINATION_DIR SLICER_WC_REVISION SLICER_WC_ROOT)
   set(multiValueArgs)
   cmake_parse_arguments(MY "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -44,6 +44,13 @@ function(slicerFunctionGenerateExtensionDescription)
     set(MY_EXTENSION_ENABLED 1)
   endif()
 
+  if(NOT DEFINED MY_EXTENSION_SVNUSERNAME)
+    set(MY_EXTENSION_SVNUSERNAME "")
+  endif()
+  if(NOT DEFINED MY_EXTENSION_SVNPASSWORD)
+    set(MY_EXTENSION_SVNPASSWORD "")
+  endif()
+
   # If not specified, EXTENSION_BUILD_SUBDIRECTORY default to "."
   if("${MY_EXTENSION_BUILD_SUBDIRECTORY}" STREQUAL "")
     set(MY_EXTENSION_BUILD_SUBDIRECTORY ".")
@@ -62,6 +69,15 @@ function(slicerFunctionGenerateExtensionDescription)
   #set(scm_path_token ${MY_EXTENSION_WC_TYPE}path)
   set(scm_path_token scmurl)
   set(scm_url ${MY_EXTENSION_WC_URL})
+
+  if(NOT ${MY_EXTENSION_SVNUSERNAME} STREQUAL "")
+     set( svnusername "svnusername ${MY_EXTENSION_SVNUSERNAME}" )
+     set( svnpassword "svnpassword ${MY_EXTENSION_SVNPASSWORD}" )
+  else()
+    if( NOT ${MY_EXTENSION_SVNPASSWORD} STREQUAL "" )
+      message(FATAL_ERROR "svn password set but svn username not set")
+    endif()
+  endif()
 
   #message(MY_SLICER_WC_ROOT:${MY_SLICER_WC_ROOT})
   #message(MY_SLICER_WC_REVISION:${MY_SLICER_WC_REVISION})
@@ -91,6 +107,8 @@ function(slicerFunctionGenerateExtensionDescription)
 scm ${scm_type}
 ${scm_path_token} ${scm_url}
 scmrevision ${MY_EXTENSION_WC_REVISION}
+${svnusername}
+${svnpassword}
 
 # list dependencies
 # - These should be names of other modules that have .s4ext files
