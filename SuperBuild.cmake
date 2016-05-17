@@ -140,6 +140,9 @@ endif()
 
 if(Slicer_USE_NUMPY)
   list(APPEND Slicer_DEPENDENCIES NUMPY)
+  if(Slicer_USE_SCIPY)
+    list(APPEND Slicer_DEPENDENCIES SciPy)
+  endif()
 endif()
 
 if(Slicer_USE_PYTHONQT_WITH_TCL AND UNIX)
